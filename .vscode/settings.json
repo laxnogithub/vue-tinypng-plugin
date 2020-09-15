@@ -1,0 +1,6 @@
+{
+    "path-autocomplete.pathMappings": {
+        "@ex": "${folder}/examples/",
+        "@": "${folder}/packages/",
+    },
+}
