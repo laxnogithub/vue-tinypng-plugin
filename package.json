@@ -1,6 +1,6 @@
 {
   "name": "vue-tinypng-plugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "license": "MIT",
   "scripts": {
@@ -60,5 +60,8 @@
   "description": "tinypng for webpack or vue",
   "main": "./packages/index.js",
   "repository": "https://github.com/laxnogithub/vue-tinypng-plugin.git",
-  "author": "1546356935@qq.com"
+  "author": "1546356935@qq.com",
+  "keywords":[
+    "vue","webpack","tinypng","compress","image","plugin","tinyjpg","tiny","png","jpg","img","tinify"
+  ]
 }
