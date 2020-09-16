@@ -26,7 +26,7 @@ loadComponents();
 const router = new VueRouter({
 	mode: "history",
 	base: process.env.BASE_URL,
-	routes
+	routes,
 });
 
 export default router;
@@ -48,13 +48,13 @@ function getName(str, is = true) {
  * @description load components and add route
  */
 function loadComponents() {
-	views.keys().forEach(view => {
+	views.keys().forEach((view) => {
 		const comName = getName(view);
 		const viewobj = views(view).default;
 		routes.push({
 			path: "/" + comName,
 			name: viewobj.name,
-			component: viewobj
+			component: viewobj,
 		});
 	});
 }

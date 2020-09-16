@@ -4,11 +4,10 @@
  * @Autor: lax
  * @Date: 2020-04-07 20:45:54
  * @LastEditors: lax
- * @LastEditTime: 2020-09-15 16:12:05
+ * @LastEditTime: 2020-09-16 10:10:13
  -->
 <template>
 	<div id="app">
-		<router-link id="sys" to="/page">Go</router-link>
 		<router-view />
 	</div>
 </template>

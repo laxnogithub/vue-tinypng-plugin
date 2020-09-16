@@ -4,7 +4,7 @@
  * @Autor: lax
  * @Date: 2020-04-01 12:54:53
  * @LastEditors: lax
- * @LastEditTime: 2020-09-16 00:04:23
+ * @LastEditTime: 2020-09-16 11:38:59
  */
 const tinypngPlugin = require("./packages/index.js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -27,19 +27,21 @@ module.exports = {
 	 */
 	configureWebpack: (config) => {
 		config.devtool = "source-map";
-		return {
-			output: {
-				filename: "js/[name].js?v=[hash:6]",
-				chunkFilename: "js/[name].js?v=[hash:6]",
-			},
-			plugins: [
-				new MiniCssExtractPlugin({
-					filename: `css/[name].css?v=[hash:6]`,
-					chunkFilename: `css/[name].css?v=[hash:6]`,
-				}),
-				new tinypngPlugin(),
-			],
+		// plugin
+		const plugins = [
+			new MiniCssExtractPlugin({
+				filename: `css/[name].css?v=[hash:6]`,
+				chunkFilename: `css/[name].css?v=[hash:6]`,
+			}),
+		];
+		// output
+		const output = {
+			filename: "js/[name].js?v=[hash:6]",
+			chunkFilename: "js/[name].js?v=[hash:6]",
 		};
+		if (config.mode === "production") plugins.push(new tinypngPlugin());
+
+		return { output, plugins };
 	},
 	/* 设置build的引用文件路径 */
 
