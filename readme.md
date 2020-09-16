@@ -4,7 +4,7 @@
  * @Autor: lax
  * @Date: 2020-09-16 11:51:36
  * @LastEditors: lax
- * @LastEditTime: 2020-09-16 11:59:19
+ * @LastEditTime: 2020-09-16 12:00:08
 -->
 # info
 auto compress img by tinypng when used webpack and vue
@@ -34,7 +34,7 @@ new tinypngPlugin({
 ## import
 ``` 
 configureWebpack: (config) => {
-    return {import
+    return {
         plugins: [
             new tinypngPlugin()
         ]
