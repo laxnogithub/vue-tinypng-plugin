@@ -4,7 +4,7 @@
  * @Autor: lax
  * @Date: 2020-04-01 12:54:53
  * @LastEditors: lax
- * @LastEditTime: 2020-09-16 11:38:59
+ * @LastEditTime: 2020-09-16 11:54:19
  */
 const tinypngPlugin = require("./packages/index.js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
