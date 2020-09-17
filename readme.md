@@ -4,7 +4,7 @@
  * @Autor: lax
  * @Date: 2020-09-16 11:51:36
  * @LastEditors: lax
- * @LastEditTime: 2020-09-16 12:00:08
+ * @LastEditTime: 2020-09-17 11:19:33
 -->
 # info
 auto compress img by tinypng when used webpack and vue
@@ -40,4 +40,26 @@ configureWebpack: (config) => {
         ]
     }
 }
+```
+
+# options
+
+## key
+your key
+``` 
+key:XXX,
+``` 
+
+## use
+true/false run this plugin
+default: true
+```
+use: true/false,
+```
+
+## reg
+compress img reg
+default: /\.(png|jpe?g|bmp|gif)/i
+```
+reg: XXXX
 ```

@@ -6,7 +6,7 @@
  * @Autor: lax
  * @Date: 2020-09-14 16:58:38
  * @LastEditors: lax
- * @LastEditTime: 2020-09-16 11:19:52
+ * @LastEditTime: 2020-09-17 11:10:34
  */
 const path = require("path");
 const tinify = require("tinify");
@@ -21,8 +21,10 @@ class Tinypng {
 		this.p = p;
 		// img:png/jpg/jpeg/bmp/gif
 		this.REG = p.reg || DEFAULT_REG;
+		this.use = p.use !== undefined ? p.use : true;
 	}
 	apply(compiler) {
+		if (!this.use) return;
 		const self = this;
 		this._start(compiler);
 		compiler.hooks.emit.tapAsync("tinypngPlugin", (compilation, callback) => {
@@ -80,9 +82,9 @@ class Tinypng {
 	_start(c) {
 		this.setKey(c);
 		log("");
-		log(Chalk.greenBright("###############################"));
-		log(Chalk.greenBright("## tinypng compress strat... ##"));
-		log(Chalk.greenBright("###############################"));
+		log(Chalk.greenBright("##############################################"));
+		log(Chalk.greenBright("######### tinypng compress strat... ##########"));
+		log(Chalk.greenBright("##############################################"));
 	}
 	_end() {
 		log("");
