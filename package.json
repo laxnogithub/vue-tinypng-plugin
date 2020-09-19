@@ -2,7 +2,13 @@
   "name": "vue-tinypng-plugin",
   "version": "1.1.2",
   "private": false,
+  "description": "tinypng for webpack or vue",
+  "main": "./packages/index.js",
   "license": "MIT",
+  "author": {
+    "name": "lax",
+    "email": "1546356935@qq.com"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "rm -rf dist && vue-cli-service build",
@@ -57,10 +63,7 @@
       "git add"
     ]
   },
-  "description": "tinypng for webpack or vue",
-  "main": "./packages/index.js",
   "repository": "https://github.com/laxnogithub/vue-tinypng-plugin.git",
-  "author": "1546356935@qq.com",
   "keywords":[
     "vue","webpack","tinypng","compress","image","plugin","tinyjpg","tiny","png","jpg","img","tinify"
   ]
