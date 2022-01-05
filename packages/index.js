@@ -3,33 +3,43 @@
  * tinypng: https://tinypng.com/developers/reference/nodejs
  * webpack: https://webpack.js.org/api/compilation-object/#getassets
  * @Version: 1.0.0
- * @Autor: lax
+ * @Author: lax
  * @Date: 2020-09-14 16:58:38
  * @LastEditors: lax
- * @LastEditTime: 2020-09-18 10:00:14
+ * @LastEditTime: 2022-01-05 16:16:21
  */
 const path = require("path");
+const fs = require("fs-extra");
 const tinify = require("tinify");
 const Chalk = require("chalk");
 const log = console.log;
 const errorHandler = require("./error");
 const { RawSource } = require("webpack-sources");
-
 const DEFAULT_REG = /\.(png|jpe?g|bmp|gif)/i;
+const PLUGIN_NAME = "tinypngPlugin";
+const CONFIG_NAME = "tinypng.js";
 class Tinypng {
 	constructor(p = {}) {
 		this.p = p;
-		// img:png/jpg/jpeg/bmp/gif
 		this.REG = p.reg || DEFAULT_REG;
 		this.use = p.use !== undefined ? p.use : true;
-		this.name = "tinypngPlugin";
+		this.name = PLUGIN_NAME;
+		this.workspace = "";
+	}
+	_init(comp) {
+		this.__getWorkspace(comp.context);
+		this.config = this.__getOptions();
+	}
+	__getWorkspace(context) {
+		this.workspace = context;
 	}
 	apply(compiler) {
 		// options.use = false
 		if (!this.use) return;
+		this._init(compiler);
 		const self = this;
 		// can`t find key or something error
-		if (!this._start(compiler)) return;
+		if (!this._start()) return;
 		compiler.hooks.emit.tapAsync(this.name, (compilation, callback) => {
 			// get all assets
 			const assets = compilation.getAssets();
@@ -73,8 +83,8 @@ class Tinypng {
 	getTinyCount() {
 		return tinify.compressionCount;
 	}
-	setKey(comp) {
-		const key = this.p.key || this.getKeyFromfile(comp);
+	_setKey() {
+		const key = this.config.key;
 		if (!key) {
 			log("");
 			log(Chalk.redBright("can`t find key in tinypng.js or options.key"));
@@ -84,21 +94,19 @@ class Tinypng {
 		tinify.key = key;
 		return true;
 	}
-	getKeyFromfile(comp) {
-		let key = null;
-		try {
-			key = require(path.join(comp.context, "./tinypng.js")).key;
-		} catch (error) {
-			return key;
-		}
-		return key;
+	__getOptions() {
+		const LOCAL_PATH = path.join(this.workspace, `./${CONFIG_NAME}`);
+		const LOCAL_OPTIONS = fs.ensureFileSync(LOCAL_PATH)
+			? require(LOCAL_PATH)
+			: {};
+		return Object.assign({}, this.p, LOCAL_OPTIONS);
 	}
-	_start(c) {
-		const can = this.setKey(c);
+	_start() {
+		const can = this._setKey();
 		if (!can) return false;
 		log("");
 		log(Chalk.greenBright("##############################################"));
-		log(Chalk.greenBright("######### tinypng compress strat... ##########"));
+		log(Chalk.greenBright("######### tinypng compress start... ##########"));
 		log(Chalk.greenBright("##############################################"));
 		return true;
 	}
@@ -107,7 +115,9 @@ class Tinypng {
 		log(Chalk.greenBright("##############################################"));
 		log(Chalk.greenBright("## success: all imgs compressed by tinypng! ##"));
 		log(Chalk.greenBright("##############################################"));
-		log(Chalk.greenBright("* this key compressd count:" + this.getTinyCount()));
+		log(
+			Chalk.greenBright("* this key compressed count:" + this.getTinyCount())
+		);
 	}
 	_each(name, is) {
 		log("");

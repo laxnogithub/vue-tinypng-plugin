@@ -3,4 +3,7 @@
         "@ex": "${folder}/examples/",
         "@": "${folder}/packages/",
     },
+    "cSpell.words": [
+        "tinify"
+    ],
 }

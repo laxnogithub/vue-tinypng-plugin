@@ -1,10 +1,10 @@
 /*
  * @Description: vue.config.js
  * @Version: 2.0.0
- * @Autor: lax
+ * @Author: lax
  * @Date: 2020-04-01 12:54:53
  * @LastEditors: lax
- * @LastEditTime: 2020-09-18 10:01:04
+ * @LastEditTime: 2022-01-05 16:03:06
  */
 const tinypngPlugin = require("./packages/index.js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");

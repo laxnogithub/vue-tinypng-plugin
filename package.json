@@ -22,6 +22,7 @@
   ],
   "dependencies": {
     "chalk": "^4.1.0",
+    "fs-extra": "^10.0.0",
     "tinify": "^1.6.0-beta.2",
     "webpack-sources": "^1.4.3"
   },
@@ -64,7 +65,18 @@
     ]
   },
   "repository": "https://github.com/laxnogithub/vue-tinypng-plugin.git",
-  "keywords":[
-    "vue","webpack","tinypng","compress","image","plugin","tinyjpg","tiny","png","jpg","img","tinify"
+  "keywords": [
+    "vue",
+    "webpack",
+    "tinypng",
+    "compress",
+    "image",
+    "plugin",
+    "tinyjpg",
+    "tiny",
+    "png",
+    "jpg",
+    "img",
+    "tinify"
   ]
 }
