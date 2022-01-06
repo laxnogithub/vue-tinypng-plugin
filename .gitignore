@@ -3,6 +3,7 @@ node_modules
 /dist
 yarn.lock
 tinypng.js
+.tinypng
 
 /tests/e2e/reports/
 selenium-debug.log
