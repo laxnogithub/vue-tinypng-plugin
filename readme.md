@@ -1,10 +1,10 @@
 <!--
  * @Description: 
  * @Version: 1.0.0
- * @Autor: lax
+ * @Author: lax
  * @Date: 2020-09-16 11:51:36
  * @LastEditors: lax
- * @LastEditTime: 2020-09-17 11:19:33
+ * @LastEditTime: 2022-01-06 23:39:54
 -->
 # info
 auto compress img by tinypng when used webpack and vue
