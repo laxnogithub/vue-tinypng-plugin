@@ -4,6 +4,7 @@
         "@": "${folder}/packages/",
     },
     "cSpell.words": [
-        "tinify"
+        "tinify",
+        "tinyjpg"
     ],
 }

@@ -6,82 +6,133 @@
  * @Author: lax
  * @Date: 2020-09-14 16:58:38
  * @LastEditors: lax
- * @LastEditTime: 2022-01-05 16:16:21
+ * @LastEditTime: 2022-01-06 18:21:01
  */
 const path = require("path");
 const fs = require("fs-extra");
 const tinify = require("tinify");
+const md5 = require("./md5");
 const Chalk = require("chalk");
 const log = console.log;
 const errorHandler = require("./error");
 const { RawSource } = require("webpack-sources");
 const DEFAULT_REG = /\.(png|jpe?g|bmp|gif)/i;
 const PLUGIN_NAME = "tinypngPlugin";
-const CONFIG_NAME = "tinypng.js";
-class Tinypng {
+const CONFIG_NAME = "tinypng";
+const CACHE_PATH = ".tinypng";
+class TinypngPlugin {
 	constructor(p = {}) {
 		this.p = p;
-		this.REG = p.reg || DEFAULT_REG;
-		this.use = p.use !== undefined ? p.use : true;
 		this.name = PLUGIN_NAME;
 		this.workspace = "";
+		this.REG = p.reg || DEFAULT_REG;
+		this.use = p.use !== undefined ? p.use : true;
 	}
 	_init(comp) {
-		this.__getWorkspace(comp.context);
+		this.workspace = comp.context;
+		this._getCache();
 		this.config = this.__getOptions();
 	}
-	__getWorkspace(context) {
-		this.workspace = context;
-	}
+	// webpack hook
 	apply(compiler) {
-		// options.use = false
-		if (!this.use) return;
-		this._init(compiler);
 		const self = this;
+		// this plugin not use
+		if (!this.use) return;
+		// init generate tinypng properties
+		this._init(compiler);
 		// can`t find key or something error
 		if (!this._start()) return;
+
 		compiler.hooks.emit.tapAsync(this.name, (compilation, callback) => {
-			// get all assets
-			const assets = compilation.getAssets();
-			// img list by reg
-			const imgs = assets.filter((asset) => self.REG.test(asset.name));
-			// skip it when can`t find img
-			if (!imgs.length) callback();
-			// img promise
-			const promises = imgs.map(async (img) => {
-				// compressed by tinypng
-				const tiny = await self.tinypng(img);
-				// update asset in webpack
-				if (tiny) compilation.updateAsset(img.name, new RawSource(tiny));
+			const assets = this.getAssets(compilation);
+			// skip it when can`t find asset
+			if (!assets.length) callback();
+
+			const promises = assets.map(async (asset) => {
+				// asset not exist,
+				if (!this.exist(asset)) {
+					try {
+						// compressed by tinypng
+						const tiny = await self.tinypng(asset);
+						tiny && compilation.updateAsset(asset.name, new RawSource(tiny));
+						// add record
+						this._addCache(asset);
+						this._compressed(asset.name, true);
+						return Promise.resolve();
+					} catch (error) {
+						this._compressed(asset.name, false);
+						return Promise.resolve();
+					}
+				}
+				// asset exist, skip
+				this._jump(asset.name);
 				return Promise.resolve();
 			});
 			return Promise.all(promises).then(() => {
-				this._end();
+				this.updateCache();
+				self._end();
 				callback();
 			});
 		});
 	}
+	// compress assets by tinypng
 	tinypng(rawSource) {
-		return new Promise((resolve) => {
-			let is_success = true;
+		return new Promise((resolve, reject) => {
 			const source = tinify.fromBuffer(rawSource.source._value);
 			// upload from tinypng
 			source.toBuffer((err, result) => {
 				// error with key
 				if (err instanceof tinify.AccountError) {
 					log(Chalk.redBright(errorHandler.accountError));
+					reject(err);
 				}
 				if (err) {
-					is_success = false;
 					log(Chalk.redBright(err));
+					reject(err);
 				}
-				this._each(rawSource.name, is_success);
 				resolve(result);
 			});
 		});
 	}
 	getTinyCount() {
 		return tinify.compressionCount;
+	}
+	updateCache() {
+		const CACHE_ROOT = path.resolve(this.workspace, CACHE_PATH);
+		const map = (() => {
+			let result = {};
+			for (let [key, value] of this.hash.entries()) {
+				result[key] = value;
+			}
+			return result;
+		})();
+		fs.writeJSONSync(`${CACHE_ROOT}/hash.json`, map);
+	}
+	_addCache(img) {
+		this.hash.set(img.name, md5(img.source._value));
+	}
+	_getCache() {
+		const CACHE_ROOT = path.resolve(this.workspace, CACHE_PATH);
+		fs.ensureFileSync(CACHE_ROOT + "/hash.json");
+		let file;
+		try {
+			file = require(`${CACHE_ROOT}/hash.json`);
+		} catch (error) {
+			file = {};
+		}
+		this.hash = new Map(Object.entries(file));
+	}
+	exist(asset) {
+		const newAssetHash = md5(asset.source._value);
+		const oldAssetHash = this.hash.get(asset.name);
+		return oldAssetHash === newAssetHash;
+	}
+	getAssets(compilation) {
+		// get all assets
+		const _assets = compilation.getAssets();
+		// img list by reg
+		const assets = _assets.filter((asset) => this.REG.test(asset.name));
+		return assets;
 	}
 	_setKey() {
 		const key = this.config.key;
@@ -96,10 +147,9 @@ class Tinypng {
 	}
 	__getOptions() {
 		const LOCAL_PATH = path.join(this.workspace, `./${CONFIG_NAME}`);
-		const LOCAL_OPTIONS = fs.ensureFileSync(LOCAL_PATH)
-			? require(LOCAL_PATH)
-			: {};
-		return Object.assign({}, this.p, LOCAL_OPTIONS);
+		fs.ensureFileSync(LOCAL_PATH + ".js");
+		const LOCAL_OPTIONS = require(`${LOCAL_PATH}.js`);
+		return Object.assign({}, LOCAL_OPTIONS, this.p.config || {});
 	}
 	_start() {
 		const can = this._setKey();
@@ -119,10 +169,14 @@ class Tinypng {
 			Chalk.greenBright("* this key compressed count:" + this.getTinyCount())
 		);
 	}
-	_each(name, is) {
+	_compressed(name, is) {
 		log("");
 		if (is) log(Chalk.greenBright("* filename: " + name + " compressed!"));
 		if (!is) log(Chalk.redBright("* filename: " + name + " not compressed!"));
 	}
+	_jump(name) {
+		log("");
+		log(Chalk.greenBright("* filename: " + name + " not change, skip!"));
+	}
 }
-module.exports = Tinypng;
+module.exports = TinypngPlugin;
