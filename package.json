@@ -67,6 +67,7 @@
   "repository": "https://github.com/laxnogithub/vue-tinypng-plugin.git",
   "keywords": [
     "vue",
+    "vue3",
     "webpack",
     "tinypng",
     "compress",

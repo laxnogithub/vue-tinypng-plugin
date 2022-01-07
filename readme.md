@@ -4,10 +4,14 @@
  * @Author: lax
  * @Date: 2020-09-16 11:51:36
  * @LastEditors: lax
- * @LastEditTime: 2022-01-06 23:39:54
+ * @LastEditTime: 2022-01-07 14:36:10
 -->
 # info
-auto compress img by tinypng when used webpack and vue
+auto compress img by tinypng when used webpack or vue
+This plugin can record the compression and will not recompress the file if it is not updated
+
+适用于vue和webpack的tinypng插件
+能够根据记录判断资源是否发生改变，未改变时不会重复进行压缩
 
 # how to use
 
@@ -46,12 +50,18 @@ configureWebpack: (config) => {
 
 ## key
 your key
+
+tinypng的key
 ``` 
 key:XXX,
 ``` 
 
 ## use
 true/false run this plugin
+
+是否启动插件
+
+
 default: true
 ```
 use: true/false,
@@ -59,6 +69,10 @@ use: true/false,
 
 ## reg
 compress img reg
+
+需要压缩资源后缀的正则效验
+
+
 default: /\.(png|jpe?g|bmp|gif)/i
 ```
 reg: XXXX
