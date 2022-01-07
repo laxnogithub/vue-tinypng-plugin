@@ -6,7 +6,7 @@
  * @Author: lax
  * @Date: 2020-09-14 16:58:38
  * @LastEditors: lax
- * @LastEditTime: 2022-01-07 00:02:30
+ * @LastEditTime: 2022-01-07 13:20:56
  */
 const log = console.log;
 const path = require("path");
@@ -129,7 +129,9 @@ class TinypngPlugin {
 		// get all assets
 		const _assets = compilation.getAssets();
 		// img list by reg
-		const assets = _assets.filter((asset) => this.REG.test(asset.name));
+		const assets = _assets.filter(
+			(asset) => this.REG.test(asset.name) && asset.source._value !== undefined
+		);
 		return assets;
 	}
 	setKey() {
