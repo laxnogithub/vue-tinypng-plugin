@@ -4,7 +4,7 @@
  * @Author: lax
  * @Date: 2020-09-16 11:51:36
  * @LastEditors: lax
- * @LastEditTime: 2022-01-07 14:36:10
+ * @LastEditTime: 2022-01-07 15:27:09
 -->
 # info
 auto compress img by tinypng when used webpack or vue
@@ -28,10 +28,12 @@ module.exports = {
 };
 ```
 
-2.set key in options
+2.set key in options.config
 ```
 new tinypngPlugin({
-    key: "XXXX",
+    config: {
+        key: "XXXX",
+    }
 })
 ```
 
