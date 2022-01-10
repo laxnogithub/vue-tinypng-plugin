@@ -4,7 +4,7 @@
  * @Author: lax
  * @Date: 2020-04-01 12:54:53
  * @LastEditors: lax
- * @LastEditTime: 2022-01-05 16:03:06
+ * @LastEditTime: 2022-01-10 19:53:39
  */
 const tinypngPlugin = require("./packages/index.js");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -39,7 +39,17 @@ module.exports = {
 			filename: "js/[name].js?v=[hash:6]",
 			chunkFilename: "js/[name].js?v=[hash:6]",
 		};
-		if (config.mode === "production") plugins.push(new tinypngPlugin());
+		if (config.mode === "production")
+			plugins.push(
+				new tinypngPlugin({
+					cache: false,
+					config: {
+						method: "fit",
+						width: 150,
+						height: 100,
+					},
+				})
+			);
 
 		return { output, plugins };
 	},

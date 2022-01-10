@@ -4,18 +4,20 @@
  * @Author: lax
  * @Date: 2020-09-16 11:51:36
  * @LastEditors: lax
- * @LastEditTime: 2022-01-07 15:27:09
+ * @LastEditTime: 2022-01-10 20:52:04
 -->
-# info
+# 介绍/info
 auto compress img by tinypng when used webpack or vue
 This plugin can record the compression and will not recompress the file if it is not updated
 
-适用于vue和webpack的tinypng插件
+适用于vue和webpack的tinypng插件，支持调整图片尺寸
 能够根据记录判断资源是否发生改变，未改变时不会重复进行压缩
 
-# how to use
+[npm地址](https://www.npmjs.com/package/vue-tinypng-plugin)
 
-## set key
+# 使用/how to use
+
+## 设置key/set key
 
 1.create tinypng.js
 
@@ -37,7 +39,18 @@ new tinypngPlugin({
 })
 ```
 
-## import
+## import/导入
+
+### webpack
+```
+module.exports = {
+    plugins: [
+        new tinypngPlugin()
+    ]
+};
+```
+
+### vue
 ``` 
 configureWebpack: (config) => {
     return {
@@ -48,34 +61,109 @@ configureWebpack: (config) => {
 }
 ```
 
-# options
+# 配置属性/options
 
-## key
-your key
+## option.configName
+config file name , no suffix
+default "tinypng"
 
-tinypng的key
-``` 
-key:XXX,
-``` 
+配置文件名称
+默认为"tinypng"
 
-## use
+```
+configName: ""
+```
+
+## option.cachePath
+cache path
+default ".tinypng"
+
+压缩记录缓存路径
+默认为".tinypng",基于根目录
+
+```
+cachePath: ""
+```
+
+## option.cacheName
+cache name
+default "hash.json"
+
+压缩记录缓存文件名
+默认为"hash.json"
+
+```
+cacheName: ""
+```
+
+## option.reg
+compress img reg
+default: /\.(png|jpe?g|bmp)/i
+
+需要压缩资源后缀的正则效验
+默认: /\.(png|jpe?g|bmp)/i
+
+```
+reg: XXXX
+```
+
+## option.use
 true/false run this plugin
+default: true
 
 是否启动插件
+默认: true
 
-
-default: true
 ```
 use: true/false,
 ```
 
-## reg
-compress img reg
+## option.cache
+Whether to record compressed cache
+default: true
 
-需要压缩资源后缀的正则效验
+是否启用缓存记录
+默认: true
 
-
-default: /\.(png|jpe?g|bmp|gif)/i
 ```
-reg: XXXX
+cache: true/false,
+```
+
+## option.config
+## option.config.key
+your key
+
+tinypng的key
+
+``` 
+key:XXX,
+``` 
+## option.config.method
+resize method scale/fit/cover/thumb
+[look](https://tinypng.com/developers/reference/nodejs)
+
+图片调整模式 支持:scale/fit/cover/thumb
+[详情参考](https://tinypng.com/developers/reference/nodejs)
+
+```
+method: ""
+```
+
+
+## option.config.width
+resize asset width
+
+调整图片的宽度尺寸
+
+```
+width: ""
+```
+
+## option.config.height
+resize asset height
+
+调整图片的高度尺寸
+
+```
+height: ""
 ```

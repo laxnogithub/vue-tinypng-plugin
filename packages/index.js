@@ -6,9 +6,8 @@
  * @Author: lax
  * @Date: 2020-09-14 16:58:38
  * @LastEditors: lax
- * @LastEditTime: 2022-01-10 17:13:16
+ * @LastEditTime: 2022-01-10 19:54:59
  */
-const log = console.log;
 const path = require("path");
 const fs = require("fs-extra");
 const tinify = require("tinify");
@@ -20,16 +19,16 @@ const PLUGIN_NAME = "tinypngPlugin";
 const CONFIG_NAME = "tinypng";
 const CACHE_PATH = ".tinypng";
 const CACHE_NAME = "hash";
-// const RESIZE = {};
 class TinypngPlugin {
 	constructor(p = {}) {
 		this.p = p;
 		this.CONFIG_NAME = p.configName || CONFIG_NAME;
-		this.CACHE_PATH = p.CachePath || CACHE_PATH;
+		this.CACHE_PATH = p.cachePath || CACHE_PATH;
 		this.CACHE_NAME = p.cacheName || CACHE_NAME;
 		this.name = PLUGIN_NAME;
 		this.REG = p.reg || DEFAULT_REG;
 		this.use = p.use !== undefined ? p.use : true;
+		this.cache = p.cache !== undefined ? p.cache : true;
 	}
 	_init(comp) {
 		// project root
@@ -38,6 +37,7 @@ class TinypngPlugin {
 		this.getCache();
 		// config
 		this.config = this.__getOptions();
+		// resize
 		this.resize = this.__getResize();
 	}
 	// webpack hook
@@ -58,7 +58,7 @@ class TinypngPlugin {
 
 			const promises = assets.map(async (asset) => {
 				// asset not exist,
-				if (!this.exist(asset)) {
+				if (!this.cache || !this.exist(asset)) {
 					try {
 						// compressed by tinypng
 						const tiny = await self.tinypng(asset);
@@ -84,11 +84,12 @@ class TinypngPlugin {
 		});
 	}
 	// compress assets by tinypng
-	tinypng(rawSource, option) {
+	tinypng(rawSource, resize = this.resize) {
 		return new Promise((resolve, reject) => {
-			const source = tinify.fromBuffer(rawSource.source._value);
+			let source = tinify.fromBuffer(rawSource.source._value);
+			// resize asset
+			resize && (source = source.resize(resize));
 			// upload from tinypng
-			source.resize(option);
 			source.toBuffer((err, result) => {
 				// error with key
 				if (err instanceof tinify.AccountError) {
@@ -171,11 +172,13 @@ class TinypngPlugin {
 		return Object.assign({}, LOCAL_OPTIONS, this.p.config || {});
 	}
 	__getResize() {
-		// const option = {
-		// 	method: this.config.method,
-		// 	width: this.config.width,
-		// 	height: this.config.height,
-		// };
+		if (!this.config.method) return null;
+		const resize = {
+			method: this.config.method,
+			width: this.config.width,
+			height: this.config.height,
+		};
+		return resize;
 	}
 	_start() {
 		success(STATE.start());
@@ -188,7 +191,6 @@ class TinypngPlugin {
 		if (!is) warn(STATE.notCompressed(name));
 	}
 	_jump(name) {
-		log("");
 		success(STATE.skip(name));
 	}
 }
