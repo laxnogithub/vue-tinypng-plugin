@@ -6,7 +6,7 @@
  * @Author: lax
  * @Date: 2020-09-14 16:58:38
  * @LastEditors: lax
- * @LastEditTime: 2022-01-07 13:20:56
+ * @LastEditTime: 2022-01-10 17:13:16
  */
 const log = console.log;
 const path = require("path");
@@ -15,16 +15,19 @@ const tinify = require("tinify");
 const { md5, mapToJson } = require("./tools");
 const { success, warn, ERROR, STATE } = require("./message");
 const { RawSource } = require("webpack-sources");
-const DEFAULT_REG = /\.(png|jpe?g|bmp|gif)/i;
+const DEFAULT_REG = /\.(png|jpe?g|bmp)/i;
 const PLUGIN_NAME = "tinypngPlugin";
 const CONFIG_NAME = "tinypng";
 const CACHE_PATH = ".tinypng";
 const CACHE_NAME = "hash";
+// const RESIZE = {};
 class TinypngPlugin {
 	constructor(p = {}) {
 		this.p = p;
+		this.CONFIG_NAME = p.configName || CONFIG_NAME;
+		this.CACHE_PATH = p.CachePath || CACHE_PATH;
+		this.CACHE_NAME = p.cacheName || CACHE_NAME;
 		this.name = PLUGIN_NAME;
-		this.workspace = "";
 		this.REG = p.reg || DEFAULT_REG;
 		this.use = p.use !== undefined ? p.use : true;
 	}
@@ -35,6 +38,7 @@ class TinypngPlugin {
 		this.getCache();
 		// config
 		this.config = this.__getOptions();
+		this.resize = this.__getResize();
 	}
 	// webpack hook
 	apply(compiler) {
@@ -80,14 +84,27 @@ class TinypngPlugin {
 		});
 	}
 	// compress assets by tinypng
-	tinypng(rawSource) {
+	tinypng(rawSource, option) {
 		return new Promise((resolve, reject) => {
 			const source = tinify.fromBuffer(rawSource.source._value);
 			// upload from tinypng
+			source.resize(option);
 			source.toBuffer((err, result) => {
 				// error with key
 				if (err instanceof tinify.AccountError) {
 					warn(ERROR.accountError);
+					reject(err);
+				}
+				if (err instanceof tinify.ClientError) {
+					warn(ERROR.accountError);
+					reject(err);
+				}
+				if (err instanceof tinify.ServerError) {
+					warn(ERROR.serverError);
+					reject(err);
+				}
+				if (err instanceof tinify.ConnectionError) {
+					warn(ERROR.connectionError);
 					reject(err);
 				}
 				if (err) {
@@ -137,9 +154,6 @@ class TinypngPlugin {
 	setKey() {
 		const key = this.config.key;
 		if (!key) {
-			log("");
-			warn("can`t find key in tinypng.js or options.key");
-			warn("skip tinypng...");
 			return false;
 		}
 		tinify.key = key;
@@ -155,6 +169,13 @@ class TinypngPlugin {
 		fs.ensureFileSync(LOCAL_PATH + ".js");
 		const LOCAL_OPTIONS = require(`${LOCAL_PATH}.js`);
 		return Object.assign({}, LOCAL_OPTIONS, this.p.config || {});
+	}
+	__getResize() {
+		// const option = {
+		// 	method: this.config.method,
+		// 	width: this.config.width,
+		// 	height: this.config.height,
+		// };
 	}
 	_start() {
 		success(STATE.start());
