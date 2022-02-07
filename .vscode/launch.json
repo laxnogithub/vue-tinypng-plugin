@@ -10,12 +10,13 @@
             "name": "Launch Chrome against localhost",
             "url": "http://localhost:8080",
             "webRoot": "${workspaceFolder}"
-        },{
+        },
+        {
             "type": "node",
             "request": "launch",
-            "name": "plugin",
-            "runtimeExecutable": "yarn",
-            "runtimeArgs": ["build"]
+            "name": "plugin debug",
+            "program": "${workspaceFolder}\\node_modules\\@vue\\cli-service\\bin\\vue-cli-service.js",
+            "args": ["build"]
         }
     ]
 }
